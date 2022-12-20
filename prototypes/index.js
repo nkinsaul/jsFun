@@ -20,26 +20,39 @@ const { dinosaurs, humans, movies } = require('./datasets/dinosaurs');
 
 // DATASET: kitties from ./datasets/kitties
 const kittyPrompts = {
-  orangePetNames() {
-    // Return an array of just the names of kitties who are orange e.g.
-        // ['Tiger', 'Snickers']
+  orangePetNames(kittyData) {
+    
+    const orangeKitties = kittyData.filter((cat) => {
+      return cat.color === 'orange';
+    });
+
+    const orangeKittyNames = orangeKitties.map((cat) => {
+      return cat.name;
+    })
+
+    return orangeKittyNames;
+
 
         /* CODE GOES HERE */
 
     // Annotation:
-    // Write your annotation here as a comment
+    // The filter method call that is assigned to the variable orangeKitties.  This method will store a new array of kitties that is only kitties with the property of 'orange'.   On the next block of code the map filter will be called on this new array and will return only the names of the cats in that array.  This will result in the value of 'Tiger', 'Snickers' being assigned to the variable orangeKittyNames
   },
 
-  sortByAge() {
+  sortByAge(kittyData) {
     // Sort the kitties by their age
 
-    /* CODE GOES HERE */
-
+    const kittiesByAge = kittyData.sort((a, b) => {
+      return b.age - a.age;
+    })
+    
+    return kittiesByAge;
+    
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to look through the kitty array and sort the kitties by their age.  Will probably use the sort prototype method to do this.  I want to return the kitties in descending order
   },
 
-  growUp() {
+  growUp(kittyData) {
     // Return an array of kitties who have all grown up by 2 years e.g.
     // [{
     //   name: 'Felicia',
@@ -52,10 +65,15 @@ const kittyPrompts = {
     //   color: 'orange'
     // },
     // ...etc]
-
-    /* CODE GOES HERE */
+    let kitties = kittyData
+    console.log(kitties);
+    const grownUpKitties = kittyData.forEach(kitty => {
+      return kitty.age + 2 
+    });
   }
 };
+
+//I want to add 2 to the age property of all of the kitties.  This will return a new array of all the kitties with the new value of age.  I will probably want to use the map prototype method to do this since I am creating a new array based off the old array with a value changed and returning an array of the same length.
 
 // PLEASE READ-----------------------
 // Currently, your functions are probably using the `kitties` global import variable.
@@ -127,7 +145,7 @@ const modPrompts = {
     // Annotation:
     // Write your annotation here as a comment
   }
-};
+}
 
 
 
@@ -157,46 +175,49 @@ const cakePrompts = {
     // ]
 
     /* CODE GOES HERE */
+    class Cake {
+      constructor(flavor, inStock) {
+        this.flavor = flavor;
+        this.inStock = inStock;
+      }
+    }
+    const cakeFlavors = 
+    cakes.map(cake => {
+      return new Cake(cake.cakeFlavor, cake.inStock);
+    });
+    return cakeFlavors
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to look the cakes but only return the flavor property of the cake and how much is in stock.
+    //the property in the return for flavor is different than the property name int he array
+    //i will want to return a new array with new object in it...will probably use map for this
   },
 
   onlyInStock() {
     // Return an array of only the cakes that are in stock
-    // e.g.
-    // [
-    //   {
-    //   cakeFlavor: 'dark chocolate',
-    //   filling: null,
-    //   frosting: 'dark chocolate ganache',
-    //   toppings: ['dutch process cocoa', 'toasted sugar', 'smoked sea salt'],
-    //   inStock: 15
-    // },
-    // {
-    //   cakeFlavor: 'yellow',
-    //   filling: 'citrus glaze',
-    //   frosting: 'chantilly cream',
-    //   toppings: ['berries', 'edible flowers'],
-    //   inStock: 14
-    // },
-    // ..etc
-    // ]
+   
+    const cakesInStock = cakes.filter (cakes => {
+      return cakes.inStock > 0
+    })
+    return cakesInStock;
 
-    /* CODE GOES HERE */
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to filter through the array and only return the cakes that are in stock....
   },
 
   totalInventory() {
     // Return the total amount of cakes in stock e.g.
     // 59
 
-    /* CODE GOES HERE */
+    const totalCakeInventory = cakes.reduce((sum, cake) => {
+      return sum + cake.inStock
+    },0);
+    return totalCakeInventory;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to return the total number of all of the cakes.  I think I want to use reduce for this
   },
 
   allToppings() {
@@ -204,10 +225,27 @@ const cakePrompts = {
     // every cake in the dataset e.g.
     // ['dutch process cocoa', 'toasted sugar', 'smoked sea salt', 'berries', ..etc]
 
-    /* CODE GOES HERE */
+    const getToppings = cakes.map(cake => {
+      return cake.toppings
+    });
+    
+    combineToppings = getToppings[0].concat(getToppings[1], getToppings[2], getToppings[3], getToppings[4], getToppings[5]);
+
+    uniqueToppingsArray = [];
+
+    const uniqueToppings = combineToppings.forEach(topping => {
+      if(!uniqueToppingsArray.includes(topping)) {
+        uniqueToppingsArray.push(topping);
+      }
+    });
+
+    return uniqueToppingsArray;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to return a new array of all unique toppings that from every cake in the data set.
+    // I also want to make sure there are no duplicates in the list
+    // I probably want to use map to isolate all of the toppings and then use includes to prevent adding a topping twice
+    // Now that all of the elements are in the array...I want to remove any duplicates.  Will need to use splice combined with another iterator
   },
 
   groceryList() {
@@ -215,16 +253,32 @@ const cakePrompts = {
     // each topping, and the values are the amount of that topping I need to buy e.g.
     // {
     //    'dutch process cocoa': 1,
-    //    'toasted sugar': 3,
+    //    'toasted sugar': 3,ç
     //    'smoked sea salt': 3,
     //    'berries': 2,
     //    ...etc
     // }
+    // const uniqueToppingsObject = ({...uniqueToppings})
+    // console.log(uniqueToppingsObject);
 
-    /* CODE GOES HERE */
+    let cakeToppings =[];
+    
+    const myList = cakes.forEach((cake) => {
+      cake.toppings.forEach((topping) => {
+        cakeToppings.push(topping);
+      })
+    });
 
-    // Annotation:
-    // Write your annotation here as a comment
+    const toppingsList = cakeToppings.reduce((acc, topping) => {
+      if (acc[topping]) {
+        acc[topping] ++
+      } else {
+        acc[topping] = 1;
+      }
+      return acc
+    }, {})
+
+    return toppingsList;
   }
 };
 
@@ -255,10 +309,12 @@ const classPrompts = {
     //   { roomLetter: 'G', program: 'FE', capacity: 29 }
     // ]
 
-    /* CODE GOES HERE */
+    const frontEndClassRooms = classrooms.filter(classroom => {
+      return classroom.program === 'FE'
+    });
 
-    // Annotation:
-    // Write your annotation here as a comment
+    return frontEndClassRooms;
+
   },
 
   totalCapacities() {
@@ -267,12 +323,21 @@ const classPrompts = {
     // {
     //   feCapacity: 110,
     //   beCapacity: 96
-    // }
+    //
 
-    /* CODE GOES HERE */
+      const capacities = classrooms.reduce((acc, classroom) => { 
+        if (classroom.program === 'FE') {
+        acc.feCapacity += classroom.capacity
+      } else if (classroom.program === 'BE') {
+        acc.beCapacity += classroom.capacity
+      }
+        return acc
+      }, {});
+      return capacities;
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I will use reduce to return a single object...I also need to combine the total capacities of each FE and BE program.  The object wants to have two keys with the names 'feCapacity' and 'beCapacity'
   },
 
   sortByCapacity() {
