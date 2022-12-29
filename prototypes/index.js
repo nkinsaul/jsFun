@@ -20,9 +20,9 @@ const { dinosaurs, humans, movies } = require('./datasets/dinosaurs');
 
 // DATASET: kitties from ./datasets/kitties
 const kittyPrompts = {
-  orangePetNames(kittyData) {
+  orangePetNames(petData) {
     
-    const orangeKitties = kittyData.filter((cat) => {
+    const orangeKitties = petData.filter((cat) => {
       return cat.color === 'orange';
     });
 
@@ -39,10 +39,10 @@ const kittyPrompts = {
     // The filter method call that is assigned to the variable orangeKitties.  This method will store a new array of kitties that is only kitties with the property of 'orange'.   On the next block of code the map filter will be called on this new array and will return only the names of the cats in that array.  This will result in the value of 'Tiger', 'Snickers' being assigned to the variable orangeKittyNames
   },
 
-  sortByAge(kittyData) {
+  sortByAge(petData) {
     // Sort the kitties by their age
 
-    const kittiesByAge = kittyData.sort((a, b) => {
+    const kittiesByAge = petData.sort((a, b) => {
       return b.age - a.age;
     })
     
@@ -52,24 +52,15 @@ const kittyPrompts = {
     // I want to look through the kitty array and sort the kitties by their age.  Will probably use the sort prototype method to do this.  I want to return the kitties in descending order
   },
 
-  growUp(kittyData) {
+  growUp(petData) {
     // Return an array of kitties who have all grown up by 2 years e.g.
-    // [{
-    //   name: 'Felicia',
-    //   age: 4,
-    //   color: 'grey'
-    // },
-    // {
-    //   name: 'Tiger',
-    //   age: 7,
-    //   color: 'orange'
-    // },
-    // ...etc]
-    let kitties = kittyData
-    console.log(kitties);
-    const grownUpKitties = kittyData.forEach(kitty => {
-      return kitty.age + 2 
-    });
+   
+    const grownUpKitties = petData.reduce((acc, kitty) => {
+      kitty.age += 2
+      acc.push(kitty);
+      return acc
+    }, [])
+    return grownUpKitties;
   }
 };
 
@@ -95,7 +86,7 @@ const kittyPrompts = {
 
 // DATASET: clubs from ./datasets/clubs
 const clubPrompts = {
-  membersBelongingToClubs() {
+  membersBelongingToClubs(data) {
     // Your function should access the clubs data through a parameter (it is being passed as an argument in the test file)
     // Create an object whose keys are the names of people, and whose values are
     // arrays that include the names of the clubs that person is a part of. e.g.
@@ -105,10 +96,19 @@ const clubPrompts = {
     //   ...etc
     // }
 
-    /* CODE GOES HERE */
+    return data.reduce ((acc, club) => {
+      club.members.forEach(member => { 
+        { 
+          acc[member] ? acc[member].push(club.club) :
+          acc[member] = [club.club];
+        }
+      })
+      return acc
+    },{});
 
     // Annotation:
-    // Write your annotation here as a comment
+
+    // I need to return an object.  Will probably use reduce to do this.  I also need to create an array within the object...the key will be the name of the person and the value of that property will be the clubs the person is a part of in an array.
   }
 };
 
@@ -140,10 +140,14 @@ const modPrompts = {
     //   { mod: 4, studentsPerInstructor: 8 }
     // ]
 
-    /* CODE GOES HERE */
+    return mods.map(mod => {
+      return { mod: mod.mod, studentsPerInstructor: (mod.students / mod.instructors) }
+    });
+
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I need to return an array of objects where there is a key that is the mod and the value of that key is the number of students divided by the number of instructors.  I can probably use map since the array will be the same length as the original
   }
 }
 
@@ -324,17 +328,30 @@ const classPrompts = {
     //   feCapacity: 110,
     //   beCapacity: 96
     //
-
       const capacities = classrooms.reduce((acc, classroom) => { 
         if (classroom.program === 'FE') {
-        acc.feCapacity += classroom.capacity
+        acc.feCapacity += classroom.capacity   
       } else if (classroom.program === 'BE') {
         acc.beCapacity += classroom.capacity
       }
         return acc
-      }, {});
+      }, {feCapacity: 0, beCapacity: 0});
       return capacities;
+
+      // let frontEndCapacity = 0
+      // let backEndCapacity = 0
+
+      // const capacities = classrooms.forEach(classroom => {
+      //   if (classroom.program === 'FE') {
+      //     feCapacites += classroom.capacity
+      //   } else if (classroom.program === 'BE') {
+      //     beCapacites += classroom.capacity
+      //   }
+      // });
+
     
+
+
 
     // Annotation:
     // I will use reduce to return a single object...I also need to combine the total capacities of each FE and BE program.  The object wants to have two keys with the names 'feCapacity' and 'beCapacity'
@@ -345,8 +362,11 @@ const classPrompts = {
 
     /* CODE GOES HERE */
 
-    // Annotation:
-    // Write your annotation here as a comment
+    const sortedClassrooms = classrooms.sort((a, b) => {
+      return a.capacity - b.capacity     
+    });
+    return sortedClassrooms;
+
   }
 };
 
@@ -359,35 +379,45 @@ const classPrompts = {
 // DATASET: books from './datasets/books
 
 const bookPrompts = {
-  removeViolence() {
+  removeViolence(books) {
     // Your function should access the books data through a parameter (it is being passed as an argument in the test file)
     // return an array of all book titles that are not horror or true crime. Eg:
 
-    //  ['1984', 'The Great Gatsby', 'Lord of the Flies', 'Harry Potter and the Sorcerer\'s Stone',
-    //   'The Hitchhiker\'s Guide to the Galaxy', 'Flowers for Algernon', 'Slaughterhouse-Five',
-    //   'The Handmaid\'s Tale', 'The Metamorphosis', 'Brave New World', 'Life of Pi',
-    //   'The Curious Incident of the Dog in the Night - Time', 'The Bell Jar',
-    //   'Catch-22', 'Treasure Island']
+    const nonHorrorBooks = books.filter(book => {
+      return book.genre !== 'Horror'
+    });
 
+    const nonTrueCrimeBooks = nonHorrorBooks.filter (book => {
+      return book.genre !== 'True Crime'
+    })
 
-    /* CODE GOES HERE */
+    const nonViolentTitles = nonTrueCrimeBooks.map(book => {
+      return book.title
+    });
 
+    return nonViolentTitles;
+    
     // Annotation:
-    // Write your annotation here as a comment
+    // I will probably want to use the filter method and find all the books that are NOT horror or true crime.  I will return this array.  This function takes a parameter which will be the array of all the books.
 
   },
-  getNewBooks() {
+  getNewBooks(books) {
     // return an array of objects containing all books that were
     // published in the 90's and 00's. Inlucde the title and the year Eg:
 
-    // [{ title: 'Harry Potter and the Sorcerer\'s Stone', year: 1997 },
-    //  { title: 'Life of Pi', year: 2001 },
-    //  { title: 'The Curious Incident of the Dog in the Night-Time', year: 2003 }]
-
-    /* CODE GOES HERE */
+    const booksAfter90 = books.filter(book => {
+      return book.published > 1990;
+    });
+    
+    const newBooksTitles = booksAfter90.reduce((acc, book) => {
+      acc.push({title: book.title, year: book.published})
+      return acc
+    }, []);
+    return newBooksTitles;
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to return an array of objects.  This array will contain objects with a key that is the 'title' of the book and the 'year' the book was published.  I will probably first need to filter out the books before 1990 and then use reduce to create the array of new objects.
   },
 
   getBooksByYear(books, year) {
@@ -400,10 +430,19 @@ const bookPrompts = {
     //  { title: 'Life of Pi', year: 2001 },
     //  { title: 'The Curious Incident of the Dog in the Night-Time', year: 2003 }]
 
-    /* CODE GOES HERE */
+    const booksAfterYear = books.filter(book => {
+      return book.published > year
+    })
+
+    const bookTitlesYear = booksAfterYear.reduce((acc, book) => {
+      acc.push({title: book.title, year: book.published})
+      return acc
+    }, []);
+    return bookTitlesYear;
+
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want to return and array of objcts where each object has 2 keys the is the 'title' of the book and the 'year' the book was published.  This function takes in 2 arguments which is the array of books and a year.  I want to only return books published after the year that is passed into the function.  I will probably first want to use the filter method to get the books published after the given year and then use reduce to put those books into an array
   }
 
 };
@@ -420,12 +459,11 @@ const bookPrompts = {
 const weatherPrompts = {
   getAverageTemps() {
     // return an array of all the average temperatures. Eg:
-    // [ 40, 40, 44.5, 43.5, 57, 35, 65.5, 62, 14, 46.5 ]
 
-    /* CODE GOES HERE */
+    return weather.map(info => (info.temperature.high + info.temperature.low) / 2)
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I need to get the average of the high and low temperature from each location and store all of of the averages in an array.  The new array should be the same length as the original array so I could use map
   },
 
   findSunnySpots() {
@@ -435,10 +473,15 @@ const weatherPrompts = {
     // 'New Orleans, Louisiana is sunny.',
     // 'Raleigh, North Carolina is mostly sunny.' ]
 
-    /* CODE GOES HERE */
+    return weather.reduce((acc, place) => {
+      if (place.type === 'sunny' || place.type === 'mostly sunny') {
+        acc.push(`${place.location} is ${place.type}.`);
+      } 
+      return acc
+    }, [])
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I need to return an array of strings that include information from locations that have a type property of 'sunny' or 'mostly sunny'.  The location should be included in the string as well as the type.
   },
 
   findHighestHumidity() {
@@ -450,11 +493,14 @@ const weatherPrompts = {
     //   temperature: { high: 49, low: 38 }
     // }
 
-    /* CODE GOES HERE */
+    const sortedLocations = weather.sort((a, b) => {
+      return b.humidity - a.humidity;
+    })
+
+    return sortedLocations[0];
 
     // Annotation:
-    // Write your annotation here as a comment
-
+    // I need to sort the locations by humidity from highest to lowest and return the first location 
   }
 };
 
@@ -476,10 +522,17 @@ const nationalParksPrompts = {
     //   parksVisited: ["Rocky Mountain", "Acadia", "Zion"]
     //}
 
-    /* CODE GOES HERE */
+    return nationalParks.reduce((obj, park) => { 
+
+       park.visited === true ? obj.parksVisited.push(park.name) : obj.parksToVisit.push(park.name);
+
+       return obj
+
+    }, {parksToVisit: [], parksVisited: []});
+
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I can use reduce to return an object.  I can probably declare the properties in the accumulator in the setup of reduce.  I can then push the parks to their corresponding arrays
   },
 
   getParkInEachState() {
@@ -492,32 +545,32 @@ const nationalParksPrompts = {
     // { Florida: 'Everglades' } ]
 
 
-    /* CODE GOES HERE */
+    return nationalParks.map(park => {
+      return { [park.location]: park.name }
+    })
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I need to return an array of objects.  Each object will have one property with the key of the park location and the value of the name of that park.  I can probably use map for this since there are not multiple national parks in each state in this data set
   },
 
   getParkActivities() {
     // Return an array of all the activities I can do
     // in a National Park. Make sure to exclude duplicates. eg:
-    // [ 'hiking',
-    //   'shoeshoing',
-    //   'camping',
-    //   'fishing',
-    //   'boating',
-    //   'watching wildlife',
-    //   'cross-country skiing',
-    //   'swimming',
-    //   'bird watching',
-    //   'canyoneering',
-    //   'backpacking',
-    //   'rock climbing' ]
 
-    /* CODE GOES HERE */
+    const allActivites = [];
+
+    const getActivites = nationalParks.forEach(park => {
+      park.activities.forEach(activity => {
+       if (!allActivites.includes(activity)) {
+        allActivites.push(activity);
+       }
+      }) 
+    })
+
+    return allActivites;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I want array that combines all of the arrays of the national park activites into one array.  I can probably chain two for Each statements to do this and push the results into a new array.
   }
 };
 
@@ -539,11 +592,13 @@ const breweryPrompts = {
   getBeerCount() {
     // Return the total beer count of all beers for every brewery e.g.
     // 40
+    
+    const totalBeers = breweries.reduce((acc, brewery) => {
+      acc += brewery.beers.length
+      return acc
+    },0)
+    return totalBeers;
 
-    /* CODE GOES HERE */
-
-    // Annotation:
-    // Write your annotation here as a comment
   },
 
   getBreweryBeerCount() {
@@ -555,10 +610,15 @@ const breweryPrompts = {
     // ...etc.
     // ]
 
-    /* CODE GOES HERE */
+    const breweryBeerCount = breweries.reduce((acc, brewery) => {
+      acc.push({name: brewery.name, beerCount: brewery.beers.length})
+      return acc
+    },[])
+    
+    return breweryBeerCount
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I will return an array of objects.  I could do this with reduce again by returning an array.  I'll need to iterate through each brewery and each object will have 2 keys: The 'name' of the brewery and the 'beerCount" which holds the number of beers which can be found again using the length method
   },
 
   getSingleBreweryBeerCount(breweryName) {
@@ -567,10 +627,13 @@ const breweryPrompts = {
     // given 'Ratio Beerworks', return 5
 
 
-    /* CODE GOES HERE */
+    const findBreweryBeerCount = breweries.find(brewery => {
+      return brewery.name === breweryName;
+    })
+    return findBreweryBeerCount.beers.length;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // This function takes in a single argument which is the name of a brewery.  I want to iterate through the breweries and find the name of one brewery and return the beer number from that single brewery.  I can probably use the find method for this.
   },
 
   findHighestAbvBeer() {
@@ -578,10 +641,21 @@ const breweryPrompts = {
     // e.g.
     // { name: 'Barrel Aged Nature\'s Sweater', type: 'Barley Wine', abv: 10.9, ibu: 40 }
 
-    /* CODE GOES HERE */
+    let allBeers = [];
+    const getAllBeers = breweries.forEach(brewery => {
+      brewery.beers.forEach(beer => {
+        allBeers.push(beer);
+      })
+    });
+
+    const boosiestBeer = allBeers.sort((a, b) => {
+      return b.abv - a.abv;
+    })
+    return boosiestBeer[0]
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I can probably sort the beers by ABV and then return the beer at the top or bottom of the list depending on how the list sorts (i.e. if the first beer has the highest abv, return the beer at the zero index and vice versa);
+    //I will probably need to put all fo the beers in a list together first
   }
 };
 
@@ -600,10 +674,26 @@ const boardGamePrompts = {
     // e.g. given an argument of "strategy", return
     // ["Chess", "Catan", "Checkers", "Pandemic", "Battle Ship", "Azul", "Ticket to Ride"]
 
-    /* CODE GOES HERE */
+    const gameTypes = []
+
+    // const games = Object.keys(boardGames).forEach(gameType => { 
+    //     console.log(gameType));
+    //     })
+
+    const sortGames = Object.entries(boardGames).forEach(game => {
+      if (game[0] === type) {
+        game[1].forEach(game => {
+          gameTypes.push(game.name);
+        })
+      }
+    })
+    
+    return gameTypes;
+      
+    // console.log(boardGames.strategy[0].name);
 
     // Annotation:
-    // Write your annotation here as a comment
+    // This function will take an argument which is a type of game.  I want to return an array that is only games that match the argument that is passed in.  I will only return the game names.  The data set is an object with keys that contain an array of objects.  So I will need to iterate over the array inside of each object.  Will probably need chained for Each for this.  BoardGames is an object with keys that hold an array of other objects.  
   },
 
   listGamesAlphabetically(type) {
@@ -612,21 +702,36 @@ const boardGamePrompts = {
     // e.g. given an argument of "childrens", return
     // ["Candy Land", "Connect Four", "Operation", "Trouble"]
 
-    /* CODE GOES HERE */
+    const games = this.listGames(type);
+    return games.sort();
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I should be able to use the same function as last time.  I just need to add an additional step which is to return the array with the games listed in alphabetical order.  Since the array will be the same length just ordered differently...I should be able to use sort or map
   },
 
   findHighestRatedGamesByType(type) {
     // Return an object which is the highest rated game within the specified type.
     // e.g. given the argument of 'party', return
     // { name: 'Codenames', rating: 7.4, maxPlayers: 8 },
+    const gamesByType = []
 
-    /* CODE GOES HERE */
+    const games = Object.entries(boardGames).forEach(game => {
+      if (game[0] === type) {
+        game[1].forEach(game => {
+          gamesByType.push(game);
+        })
+      }
+    })
+
+    const gamesByRating = gamesByType.sort((a, b) => {
+      return b.rating - a.rating;
+    })
+
+    return gamesByRating[0];
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I should again be able to call the original function which finds game by type and then use the sort method and sort the games by rating.  I then want to return the whole object which has the higest rated game.  I could use sort and then return the first index from the sorted array.
   },
 
   averageScoreByType(type) {
@@ -634,10 +739,25 @@ const boardGamePrompts = {
     // e.g. given the argument of "strategy", return 7
     // note: do not worry about rounding your result.
 
-    /* CODE GOES HERE */
+    gamesByType = [];
+
+    const games = Object.entries(boardGames).forEach(game => {
+      if (game[0] === type) {
+        game[1].forEach(game => {
+          gamesByType.push(game);
+        })
+      }
+    })
+
+    const gameRatingSum = gamesByType.reduce((sum, game) => {
+      sum += game.rating
+      return sum
+    }, 0)
+
+    return gameRatingSum / gamesByType.length;
 
     // Annotation:
-    // Write your annotation here as a comment
+    // Can again use the modifed version of my original method to find games by type.  I then want to return the average score for that particular type of game. I'll ned to add all the ratings and divide by the length of the array.  Will probably want to use reduce for this.
   },
 
   averageScoreByTypeAndPlayers(type, maximumPlayers) {
@@ -646,7 +766,28 @@ const boardGamePrompts = {
     // e.g. given the arguments of "strategy" and 2, return 6.16666666667
     // note: do not worry about rounding your result.
 
-    /* CODE GOES HERE */
+    gamesByType = [];
+
+    const games = Object.entries(boardGames).forEach(game => {
+      if (game[0] === type) {
+        game[1].forEach(game => {
+          gamesByType.push(game);
+        })
+      }
+    })
+
+    const gamesByMaxPlayers = gamesByType.filter(game => {
+      return game.maxPlayers === maximumPlayers
+    })
+
+    const gameRatingSum = gamesByMaxPlayers.reduce((sum, game) => {
+      sum += game.rating
+      return sum
+    }, 0)
+
+    return gameRatingSum / gamesByMaxPlayers.length
+
+
 
     // Annotation:
     // Write your annotation here as a comment
@@ -693,10 +834,34 @@ const turingPrompts = {
     //  { name: 'Robbie', studentCount: 18 }
     // ]
 
-    /* CODE GOES HERE */
+    const instructorStudentRatio = () => {
+
+      const allInstructors = [];
+      // const mod2Instructors = [];
+      // const mod3Instructors = [];
+      // const mod4Instructors = [];
+
+    //   const sortInstructors = instructors.forEach(instructor => {
+    //     instructor.module === 1 ? mod1Instructors.push({name: instructor.name}) : instructor.module === 2 ? mod2Instructors.push({name: instructor.name}) : instructor.module === 3 ? mod3Instructors.push({name: instructor.name}) : mod4Instructors.push({name: instructor.name}) 
+    //   })
+    //   return mod2Instructors
+    // } 
+
+    const sortInstructors = instructors.forEach(instructor => {
+      allInstructors.push({name: instructor.name, module: instructor.module})
+    })
+      const addStudentCount = cohorts.forEach(module => {
+        
+      })
+    }
+
+    console.log(instructorStudentRatio());
+  
+
+    
 
     // Annotation:
-    // Write your annotation here as a comment
+    // I need to iterate over the instructors array and create an array of objects where each object has two properties: the name of the instructor and the studentCount for their particular mod.  I could do this with map has the new array will have the same number of objects as the original.  I also need to iterate over the cohorts array and get the studentCount from each module.  This will be the studentCount property in the new array of objects.  I wonder if I can use reduce over two data sets simultaneously?
   },
 
   studentsPerInstructor() {
