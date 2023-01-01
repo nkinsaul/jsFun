@@ -834,28 +834,11 @@ const turingPrompts = {
     //  { name: 'Robbie', studentCount: 18 }
     // ]
 
-    const instructorStudentRatio = () => {
-
-      const allInstructors = [];
-      // const mod2Instructors = [];
-      // const mod3Instructors = [];
-      // const mod4Instructors = [];
-
-    //   const sortInstructors = instructors.forEach(instructor => {
-    //     instructor.module === 1 ? mod1Instructors.push({name: instructor.name}) : instructor.module === 2 ? mod2Instructors.push({name: instructor.name}) : instructor.module === 3 ? mod3Instructors.push({name: instructor.name}) : mod4Instructors.push({name: instructor.name}) 
-    //   })
-    //   return mod2Instructors
-    // } 
-
-    const sortInstructors = instructors.forEach(instructor => {
-      allInstructors.push({name: instructor.name, module: instructor.module})
+  
+    return instructors.map(instructor => {
+      return {name: instructor.name, studentCount: cohorts[instructor.module - 1].studentCount}
     })
-      const addStudentCount = cohorts.forEach(module => {
-        
-      })
-    }
 
-    console.log(instructorStudentRatio());
   
 
     
@@ -871,10 +854,19 @@ const turingPrompts = {
     // cohort1804: 10.5
     // }
 
-    /* CODE GOES HERE */
+    return cohorts.reduce((obj, cohort) => {
+      let instructorNum = instructors.filter(instructor => {
+        return instructor.module === cohort.module
+      }).length
+
+      obj[`cohort${cohort.cohort}`] = cohort.studentCount / instructorNum;
+      return obj
+    },{})
 
     // Annotation:
-    // Write your annotation here as a comment
+    // return an object, single object
+    // each property is the value of cohort in the cohorts array
+    // sum the teachers for each module
   },
 
   modulesPerTeacher() {
